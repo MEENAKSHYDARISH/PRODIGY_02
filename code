@@ -1,0 +1,42 @@
+from PIL import Image
+import os
+
+def encrypt_decrypt(image_path, key, mode):
+    
+    # Open image
+    img = Image.open(image_path)
+    pixels = img.load()
+    width, height = img.size
+
+    
+    def modify_pixel(pixel):
+        return tuple(channel ^ key for channel in pixel)
+
+   
+    for y in range(height):
+        for x in range(width):
+            pixel = pixels[x, y]
+           
+            if mode == 'encrypt' or mode == 'decrypt':
+                new_pixel = modify_pixel(pixel)
+                pixels[x, y] = new_pixel
+            else:
+                raise ValueError("Mode must be 'encrypt' or 'decrypt'")
+
+   
+    base, ext = os.path.splitext(image_path)
+    new_path = f"{base}_{mode}.png"  # Add suffix based on mode
+    img.save(new_path)
+    print(f"{mode.title()}d image saved to: {new_path}")
+
+
+image_path = input("Enter image path: ")
+key = int(input("Enter secret key (integer): "))
+mode = input("Enter 'encrypt' or 'decrypt': ").lower()
+
+
+if mode not in ('encrypt', 'decrypt'):
+    print("Invalid mode. Please enter 'encrypt' or 'decrypt'.")
+else:
+    
+    encrypt_decrypt(image_path, key, mode)
